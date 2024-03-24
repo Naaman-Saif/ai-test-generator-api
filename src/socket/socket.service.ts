@@ -50,11 +50,11 @@ export class SocketService {
         text: "Your task is to generate unit test for the provided code. Output only the code nothing else also don't add the name of language on the top:",
       },
       {
-        text: `input: ${payload.input}`,
+        text: `fileName: ${payload.fileName}\ninput: ${payload.input}`,
       },
     ];
 
-    const res = await model.stream([
+    const res = await model.invoke([
       new HumanMessage({
         content: parts.map((val) => {
           return {
@@ -65,9 +65,10 @@ export class SocketService {
       }),
     ]);
 
-    for await (const chunk of res) {
-      client.emit('generate-test', chunk.content);
-    }
+    client.emit(
+      'generate-test',
+      this.removeSpecificBackticks(res.content.toString()),
+    );
   }
 
   removeSpecificBackticks(input: string): string {
