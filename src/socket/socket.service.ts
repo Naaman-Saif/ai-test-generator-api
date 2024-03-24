@@ -54,7 +54,9 @@ export class SocketService {
       },
     ];
 
-    const res = await model.invoke([
+    const responses = [];
+
+    const res = await model.stream([
       new HumanMessage({
         content: parts.map((val) => {
           return {
@@ -65,9 +67,13 @@ export class SocketService {
       }),
     ]);
 
+    for await (const chunks of res) {
+      responses.push(chunks.content.toString());
+    }
+
     client.emit(
       'generate-test',
-      this.removeSpecificBackticks(res.content.toString()),
+      this.removeSpecificBackticks(responses.join('')),
     );
   }
 
@@ -108,7 +114,9 @@ export class SocketService {
       },
     ];
 
-    const res = await model.invoke([
+    const responses = [];
+
+    const res = await model.stream([
       new HumanMessage({
         content: parts.map((val) => {
           return {
@@ -119,9 +127,13 @@ export class SocketService {
       }),
     ]);
 
+    for await (const chunks of res) {
+      responses.push(chunks.content.toString());
+    }
+
     client.emit(
       'find-bugs-and-fix',
-      this.removeSpecificBackticks(res.content.toString()),
+      this.removeSpecificBackticks(responses.join('')),
     );
   }
 
