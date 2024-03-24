@@ -23,5 +23,10 @@ export class SocketGateway implements OnGatewayConnection {
     this.socketService.handleGenerateTest(client, payload);
   }
 
+  @SubscribeMessage('find-bugs-and-fix')
+  handleFindBugsAndFix(client: Socket, payload: any): void {
+    this.socketService.handleFindBugsAndFix(client, payload);
+  }
+
   // Implement other Socket.IO event handlers and message handlers
 }

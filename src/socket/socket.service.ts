@@ -71,6 +71,60 @@ export class SocketService {
     );
   }
 
+  async handleFindBugsAndFix(client: Socket, payload: any) {
+    const safetySettings = [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+    ];
+
+    const model = new ChatGoogleGenerativeAI({
+      modelName: 'gemini-1.0-pro',
+      temperature: 0.7,
+      topK: 50,
+      topP: 1,
+      safetySettings,
+    });
+
+    const parts = [
+      {
+        text: "Your task is to find potential bugs and fix them for the provided code. Output only the code nothing else also don't add the name of language on the top:",
+      },
+      {
+        text: `fileName: ${payload.fileName}\ninput: ${payload.input}`,
+      },
+    ];
+
+    const res = await model.invoke([
+      new HumanMessage({
+        content: parts.map((val) => {
+          return {
+            type: 'text',
+            text: val.text,
+          };
+        }),
+      }),
+    ]);
+
+    client.emit(
+      'find-bugs-and-fix',
+      this.removeSpecificBackticks(res.content.toString()),
+    );
+  }
+
   removeSpecificBackticks(input: string): string {
     // Check if the string starts and ends with a backtick
     if (input.startsWith('```') && input.endsWith('```')) {
