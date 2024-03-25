@@ -47,7 +47,7 @@ export class SocketService {
 
     const parts = [
       {
-        text: "Your task is to generate unit test for the provided code. Output only the code nothing else also don't add the name of language on the top:",
+        text: "Your task is to generate unit test for the provided code to test it for reliability, scalability and potential bugs to look out for. Output only the code nothing else also don't add the name of language on the top:",
       },
       {
         text: `fileName: ${payload.fileName}\ninput: ${payload.input}`,
@@ -98,7 +98,7 @@ export class SocketService {
     ];
 
     const model = new ChatGoogleGenerativeAI({
-      modelName: 'gemini-1.0-pro',
+      modelName: 'tunedModels/ai-test-generator-2--qjvykv8ejs6g',
       temperature: 0.7,
       topK: 50,
       topP: 1,
